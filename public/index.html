@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Response Tester</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 24px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>AI Response Tester</h1>
+  <p>Ask a question and test how the application responds.</p>
+
+  <label for="question">Your question</label>
+  <textarea id="question" rows="4"></textarea>
+
+  <button id="askButton">Ask</button>
+  <div id="result" role="status" aria-live="polite"></div>
+
+  <script>
+    const button = document.getElementById("askButton");
+    const questionInput = document.getElementById("question");
+    const result = document.getElementById("result");
+
+    button.addEventListener("click", async () => {
+      result.textContent = "Loading...";
+
+      try {
+        const response = await fetch("/api/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            question: questionInput.value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          result.textContent = data.error || "Something went wrong.";
+          return;
+        }
+
+        result.textContent = data.answer;
+      } catch {
+        result.textContent = "Unable to connect to the server.";
+      }
+    });
+  </script>
+</body>
+</html>
